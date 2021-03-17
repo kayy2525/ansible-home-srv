@@ -1,0 +1,72 @@
+---
+# tasks file for deploy_apache
+- name: ping to all servers
+  ping:
+
+- name: check linux version
+  debug: var=ansible_distribution_release
+
+- name: chown user for /var/www/html
+  shell: "chown -R jenkins:jenkins /var/www/html"
+
+- block: #--------UBUNTU block-------
+
+     - name: install apache2 server on ubuntu
+       apt: name=apache2 state=latest
+
+     - name: enable service on boot
+       service: name=apache2 enabled=yes
+
+#     - name: copy index.html on all servers
+#       copy: src={{item}} dest={{destin_file}} mode=0555
+#       loop:
+#        - "index.html"
+
+     - name: rm directory /var/www/html
+       shell: "rm -rf /var/www/html/*"
+
+       notify: Restart apache
+
+
+
+  when: ansible_distribution_release == "focal"
+          
+
+- block: #--------DEBIAN block-------
+
+     - name: install nginx server on debian
+       apt: name=nginx state=latest
+
+
+     - name: enable service on boot
+       service: name=nginx enabled=yes
+
+#     - name: copy index.html on all servers
+#       copy: src={{item}} dest={{destin_file}} mode=0555
+#       loop:
+#        - "index.html"
+     - name: rm directory /var/www/html     
+       shell: "rm -rf /var/www/html/*"
+       notify: Restart nginx
+
+  when: ansible_distribution_release == "buster"
+
+
+- block: #--------KALI block-------
+
+     - name: install nginx server on debian
+       apt: name=nginx state=latest
+
+
+     - name: enable service on boot
+       service: name=nginx enabled=yes
+
+#     - name: copy index.html on all servers
+#       copy: src={{item}} dest={{destin_file}} mode=0555
+#       loop:
+#        - "index.html"
+     - name: rm directory /var/www/html
+       shell: "rm -rf /var/www/html/*"
+       notify: Restart nginx
+
+  when: ansible_distribution_release == "kali-rolling"

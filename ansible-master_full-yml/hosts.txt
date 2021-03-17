@@ -1,0 +1,15 @@
+[test_srv_srv]
+webapp115 ansible_host=192.168.0.115 
+webapp116 ansible_host=192.168.0.116 
+
+[test_srv_deb]
+webapp117 ansible_host=192.168.0.117
+
+
+[prod_srv]
+webapp114 ansible_host=192.168.0.114 
+
+[all_srv:children]
+prod_srv
+test_srv_ub
+tset_srv_deb

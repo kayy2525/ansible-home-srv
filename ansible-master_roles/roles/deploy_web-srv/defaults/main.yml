@@ -1,0 +1,5 @@
+---
+# defaults file for deploy_apache
+#source_file: ./myindex/index.html
+destin_file: /var/www/html
+

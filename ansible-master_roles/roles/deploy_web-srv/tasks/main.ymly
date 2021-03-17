@@ -1,0 +1,55 @@
+---
+# tasks file for deploy_apache
+- name: ping to all servers
+  ping:
+
+- name: check linux version
+  debug: var=ansible_distribution_release
+
+- name: chown user for /var/www/html
+  shell: "chown -R jenkins:jenkins /var/www/html"
+
+- block: #--------UBUNTU block-------
+
+     - name: install apache2 on all servers
+       apt: name=apache2 state=latest
+
+     - name: enable service on boot
+       service: name=apache2 enabled=yes
+
+     - name: copy index.html on all servers
+       copy: src={{item}} dest={{destin_file}} mode=0555
+       loop:
+        - "index.html"
+
+#       copy: src=index.html dest={{destin_file}} mode=0555
+       notify: Restart apache
+
+     - name: reboot srv
+       shell: "sudo reboot now"
+
+
+  when: ansible_distribution_release == "focal"
+          
+
+- block: #--------DEBIAN block-------
+
+     - name: install nginx server on debian
+       apt: name=nginx state=latest
+
+
+     - name: enable service on boot
+       service: name=nginx enabled=yes
+
+     - name: copy index.html on all servers
+       copy: src={{item}} dest={{destin_file}} mode=0555
+       loop:
+        - "index.html"
+#       copy: src=index.html dest={{destin_file}} mode=0555
+       notify: Restart nginx
+
+     - name: reboot srv
+       shell: "sudo systemctl reboot now"
+
+  when: ansible_distribution_release == "buster"
+
